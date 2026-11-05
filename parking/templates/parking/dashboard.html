@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            padding: 30px;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        .card h3 {
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .card h2 {
+            font-size: 32px;
+        }
+
+        .parking-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .parking-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .slot {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .available {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .occupied {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .reserved {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .slot h3 {
+            margin-bottom: 10px;
+        }
+
+        .slot p {
+            margin: 8px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 9px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button, .nav-link {
+            display: inline-block;
+            padding: 10px 15px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .exit-button {
+            background: #dc2626;
+        }
+
+        .nav-links {
+            margin-bottom: 25px;
+        }
+
+        .messages {
+            background: #dcfce7;
+            color: #166534;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Smart Parking Management</h1>
+    <p>Parking Management &amp; Demand Analytics Platform</p>
+</header>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="messages">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="nav-links">
+
+    <a class="nav-link" href="{% url 'create_reservation' %}">
+        Create Reservation
+    </a>
+
+    <a class="nav-link" href="{% url 'reservation_list' %}">
+        View Reservations
+    </a>
+
+    <a class="nav-link" href="{% url 'parking_history' %}">
+        Parking History
+    </a>
+
+    <a class="nav-link" href="{% url 'parking_analytics' %}">
+        Parking Analytics
+    </a>
+
+</div>
+
+<section class="stats">
+
+    <div class="card">
+        <h3>Total Slots</h3>
+        <h2>{{ total_slots }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Available Slots</h3>
+        <h2>{{ available_slots }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Occupied Slots</h3>
+        <h2>{{ occupied_slots }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Reserved Slots</h3>
+        <h2>{{ reserved_slots }}</h2>
+    </div>
+
+</section>
+
+<section class="parking-section">
+
+    <h2>Parking Slot Availability</h2>
+
+    <div class="slots">
+
+        {% for slot in slots %}
+
+        <div class="slot {{ slot.status }}">
+
+            <h3>{{ slot.slot_number }}</h3>
+
+            <p>Floor: {{ slot.floor }}</p>
+            <p>Vehicle: {{ slot.vehicle_type }}</p>
+            <p>Status: {{ slot.get_status_display }}</p>
+
+            {% if slot.status == 'available' %}
+
+            <form method="POST"
+                  action="{% url 'vehicle_entry' slot.id %}">
+
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    name="vehicle_number"
+                    placeholder="Enter vehicle number"
+                    required
+                >
+
+                <button type="submit">
+                    Vehicle Entry
+                </button>
+
+            </form>
+
+            {% elif slot.status == 'occupied' %}
+
+            <form method="POST"
+                  action="{% url 'vehicle_exit' slot.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit" class="exit-button">
+                    Vehicle Exit &amp; Calculate Fee
+                </button>
+
+            </form>
+
+            {% elif slot.status == 'reserved' %}
+
+            <p>Slot is reserved.</p>
+
+            {% endif %}
+
+            <form method="POST"
+                  action="{% url 'update_slot_status' slot.id %}">
+
+                {% csrf_token %}
+
+                <select name="status">
+                    <option value="available">Available</option>
+                    <option value="occupied">Occupied</option>
+                    <option value="reserved">Reserved</option>
+                </select>
+
+                <button type="submit">
+                    Update Status
+                </button>
+
+            </form>
+
+        </div>
+
+        {% empty %}
+
+        <p>No parking slots available.</p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!-- Parking Slot Usage Chart -->
+<div class="card shadow-sm p-4 mb-4">
+    <h4 class="mb-3">Parking Slot Usage Chart</h4>
+
+    <div style="max-width: 500px; margin: auto;">
+        <canvas id="slotChart"></canvas>
+    </div>
+</div>
+
+<script>
+const slotLabels = [
+    {% for slot in slot_usage %}
+        "{{ slot.slot__slot_number|escapejs }}",
+    {% endfor %}
+];
+
+const slotData = [
+    {% for slot in slot_usage %}
+        {{ slot.total_visits|default:0 }},
+    {% endfor %}
+];
+
+new Chart(document.getElementById('slotChart'), {
+    type: 'doughnut',
+    data: {
+        labels: slotLabels,
+        datasets: [{
+            label: 'Total Visits',
+            data: slotData,
+            backgroundColor: [
+                '#2563eb',
+                '#16a34a',
+                '#f59e0b',
+                '#dc2626',
+                '#9333ea',
+                '#0891b2',
+                '#ec4899',
+                '#64748b'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.raw + ' visits';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>

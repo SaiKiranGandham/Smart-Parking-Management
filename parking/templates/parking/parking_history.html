@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking History</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .back-link {
+            background: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-container input,
+        .filter-container select {
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-container input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-container select {
+            min-width: 160px;
+        }
+
+        .search-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .clear-btn {
+            background: #64748b;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #eff6ff;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+
+        .active {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .completed {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-container input,
+            .filter-container select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>Parking History</h1>
+
+            <a href="{% url 'dashboard' %}" class="back-link">
+                Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Search and Filter -->
+        <form method="GET" class="filter-container">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search vehicle number..."
+                value="{{ search_query }}"
+            >
+
+            <select name="status">
+                <option value="">All Vehicles</option>
+
+                <option value="parked"
+                    {% if selected_status == 'parked' %}selected{% endif %}>
+                    Currently Parked
+                </option>
+
+                <option value="completed"
+                    {% if selected_status == 'completed' %}selected{% endif %}>
+                    Completed
+                </option>
+            </select>
+
+            <button type="submit" class="search-btn">
+                Search
+            </button>
+
+            <a href="{% url 'parking_history' %}" class="clear-btn">
+                Clear
+            </a>
+
+        </form>
+
+        <!-- Parking History Table -->
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vehicle Number</th>
+                        <th>Parking Slot</th>
+                        <th>Entry Time</th>
+                        <th>Exit Time</th>
+                        <th>Parking Fee</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for record in history_records %}
+                    <tr>
+                        <td>{{ record.vehicle_number }}</td>
+
+                        <td>{{ record.slot.slot_number }}</td>
+
+                        <td>
+                            {{ record.entry_time|date:"d-m-Y H:i" }}
+                        </td>
+
+                        <td>
+                            {% if record.exit_time %}
+                                {{ record.exit_time|date:"d-m-Y H:i" }}
+                            {% else %}
+                                <span class="active">Still Parked</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if record.exit_time %}
+                                <span class="completed">
+                                    ₹{{ record.amount }}
+                                </span>
+                            {% else %}
+                                <span class="active">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty">
+                            No parking history found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</body>
+</html>
