@@ -9,6 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
 # Security settings
+# Security settings
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'django-insecure-local-development-only-key'
@@ -18,8 +19,6 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
     'localhost',
-    '127.0.0.1',
-    'smart-parking-management-kiran.onrender.com',
     'smart-parking-management-django-sai.onrender.com',
 ]
 
