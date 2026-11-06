@@ -1,4 +1,3 @@
-
 """
 Django settings for config project.
 """
@@ -11,16 +10,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
-    'django-insecure-local-development-key-change-before-deployment'
+    'django-insecure-local-development-only-key'
 )
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'smart-parking-management-kiran.onrender.com',
     'smart-parking-management-django-sai.onrender.com',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://smart-parking-management-kiran.onrender.com',
+    'https://smart-parking-management-django-sai.onrender.com',
 ]
 
 # Application definition
@@ -32,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'parking',
 ]
 
@@ -95,9 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Kolkata'
-
 USE_I18N = True
 USE_TZ = True
 
@@ -107,11 +108,7 @@ STATIC_URL = 'static/'
 
 # Email
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Authentication settings
 
@@ -123,3 +120,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Default primary key field type
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
