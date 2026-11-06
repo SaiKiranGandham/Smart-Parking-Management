@@ -169,7 +169,7 @@ http://127.0.0.1:8000/
 ## Live Application
 
 **Live Demo:**  
-https://smart-parking-management-kiran.onrender.com/
+https://smart-parking-management-django-sai.onrender.com/
 
 **GitHub Repository:**  
 https://github.com/SaiKiranGandham/Smart-Parking-Management
