@@ -3,16 +3,25 @@
 Django settings for config project.
 """
 
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-f1zkangee-(&-pg6s8#7&mtw3to&zr_0jh)_10k4hd6s)mf2ni'
+# Security settings
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-local-development-key-change-before-deployment'
+)
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'smart-parking-management-kiran.onrender.com',
+    'smart-parking-management-django-sai.onrender.com',
+]
 
 # Application definition
 
@@ -57,7 +66,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 
 DATABASES = {
@@ -66,7 +74,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 
@@ -85,22 +92,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files
 
 STATIC_URL = 'static/'
-
 
 # Email
 
@@ -110,11 +113,14 @@ MAILERS = {
     },
 }
 
-
-# Authentication Settings
+# Authentication settings
 
 LOGIN_URL = '/accounts/login/'
-
 LOGIN_REDIRECT_URL = '/'
-
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# HTTPS settings for production
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
