@@ -11,7 +11,11 @@ SECRET_KEY = 'django-insecure-f1zkangee-(&-pg6s8#7&mtw3to&zr_0jh)_10k4hd6s)mf2ni
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'smart-parking-management-kiran.onrender.com',
+]
 
 
 # Application definition
